@@ -96,8 +96,42 @@ def sftp_upload(product: str):
     if product == "radar" or product == "all":
         import subprocess
         py_launcher = "py" if os.name == "nt" else "python3"
+        
+        # shut your mouth you mediocre clarinet player, it's my turn to make it actually work
+        # subprocess.run([py_launcher, os.path.join(os.path.dirname(__file__), "radar.py")])
+        
+        import requests as web
+        # either https://weast.9dcrew.org, https://rnwtr.minnwx.com/, or your own rainwater rehost
+        weastUrlBase = ""
+        # and an api key with access to maps
+        weastAPIKey = ""
 
-        subprocess.run([py_launcher, os.path.join(os.path.dirname(__file__), "radar.py")])
+        wanker74 = web.get(f"{weastUrlBase}/api/maps/timestamps/radar-us?apiKey={weastAPIKey}")
+        wanker74.raise_for_status(); wanker74 = wanker74.json()
+
+        os.makedirs("./radar", exist_ok=True)
+        
+        radardirlist = os.listdir("./radar")
+        radar_dir = "./radar"
+        for filename in radardirlist:
+            file_ts = filename.split('.')[0]
+            if file_ts not in wanker74:
+                os.remove(os.path.join(radar_dir, filename))
+
+        for ts in wanker74:
+            radarname = int(ts) + (3 * 60 * 60)
+            radarname = f"./radar/{ts}.{radarname}.tif"
+            if not os.path.exists(radarname):
+                radardownload = web.get(f"{weastUrlBase}/api/maps/raw/radar-us/{ts}.tiff?apiKey={weastAPIKey}")
+                with open(radarname, "wb") as f:
+                    f.write(radardownload.content)
+            else:
+                continue
+        
+        radardirlist = sorted([f for f in os.listdir("./radar") if f.lower().endswith(".tif")])
+        with open("./radarload.py", "w") as f:
+            for filename in radardirlist:
+                f.write(f"wxdata.setImageData('radar.us', '/twc/data/volatile/images/radar/us/{filename}')\n")
 
         with os.scandir(image_root) as f:
                 try:
@@ -118,14 +152,24 @@ def sftp_upload(product: str):
 
                 for entry in f:
                     if entry.is_file():
-                        local_image_path = entry.path
-                        remote_image_path = os.path.join(remote_image_root, entry.name)
-                        try:
-                            sftp.stat(remote_image_root)
-                        except FileNotFoundError:
-                            sftp.mkdir(remote_image_root)
-                        sftp.put(local_image_path, remote_image_path)
-                        logger.info(f"Uploaded image {local_image_path} to {remote_image_path}")
+                        if '.tif' in entry.name:
+                            local_image_path = entry.path
+                            remote_image_path = os.path.join(remote_image_root, entry.name)
+
+                            # Ensure remote directory exists
+                            try:
+                                sftp.stat(remote_image_root)
+                            except FileNotFoundError:
+                                sftp.mkdir(remote_image_root)
+
+                            try:
+                                sftp.stat(remote_image_path)
+                                logger.info(f"Skipping upload, file already exists: {remote_image_path}")
+                            except FileNotFoundError:
+                                sftp.put(local_image_path, remote_image_path)
+                                logger.info(f"Uploaded image {local_image_path} to {remote_image_path}")
+                sftp.put("./radarload.py","/home/dgadmin/radarslicer.py")
+                runomni_that_white_boy("runomni /twc/util/loadSCMTconfig.pyc /home/dgadmin/radarslicer.py")
     if product == "text_data" or product == "all":
         for file_path in enumerate_the_loathed_files():
             remote_path = os.path.join("/home/dgadmin/", os.path.relpath(file_path, data_root))
