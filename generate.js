@@ -35,7 +35,7 @@ const codeConversion = JSON.parse(fs.readFileSync('code-conversion.json', 'utf8'
 const obs_interest_list = interest_list.obsStation;
 const coop_interest_list = interest_list.coopId;
 const county_interest_list = interest_list.county;
-const airport_interest_list = interest_list.airport ?? []; // NEW: add "airport": ["KGRB", "KMKE", ...] to your interest_lists.json
+const airport_interest_list = interest_list.airportId ?? [];
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
