@@ -1,4 +1,3 @@
-![maricom mobile](image.png)
 # FEEL THE POWER OF MARI ENCODER
 This is a data aggregator and provisioner for the Weatherscan and Domestic IntelliStar systems. It fetches the remote config.py file, extracts the needed locations, packages data for each said locations then uploads it via SFTP to the IntelliStar.
 
@@ -7,9 +6,10 @@ Much like GIT, the name MARI can mean many things, mood permitting:
  or:
  - LUCKY CHARM DATA ENCODER. If your name is Jaidenism. No further comment.
  - MALICIOUS ALCOHOLIC weatherRANCH INFORMATION ENCODER. If data suddenly breaks on your IntelliStar and you spend the last six hours trying to see what's wrong only to find out that it's this one line of code that only shows up under certain weather that breaks the whole system because the IntelliStar is old and shit and wont accept anything modern.
+ - MUGGED AGGREGATOR from RAINWATER INTERNAL. If you figured out that almost all of this code was stolen from the Rainwater Internal i1 encoder and just hacked to work standalone.
 
  # Installation
-MARI ENCODER uses Node.JS and Python. A relatively new version of Node is recommended for ESM module imports. For Python, Paramiko version 3.5.1 or lower is REQUIRED because newer versions will not negotiate with newer SSH algorithms used on the IntelliStar's FreeBSD installation. Please run the following installation commands in your downloaded directory:
+MARI ENCODER uses Node.JS and Python. A relatively new version of Node is recommended for ESM module imports. For Python, Paramiko version 3.5.1 or lower is REQUIRED because newer versions will not negotiate with the older SSH algorithms used on the Intellistar. Please run the following installation commands in your downloaded directory:
 
 To install dependencies for node:
 
@@ -28,8 +28,9 @@ MARI ENCODER leverages the setBulletin.pyc script in order to push bulletin craw
 ```runomni /twc/util/loadSCMTConfig.pyc /twc/util/defaultBulletinInfo.py```
 
 # Acknowledgements
+ - daisy/susie. making the original rainwater encoder that this steals from.
  - mari. making this application.
  - rai. making this application more.
-
+ - lily. fixing what mari and rai broke.
 # Contributing
 This program is still in development. Please make a pull request for any contributions you would like to add. K THX BYE!!!!!!!!!!
